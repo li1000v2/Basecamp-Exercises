@@ -1,0 +1,31 @@
+{
+  "folders": [
+    { "name": "ROOT (workshop)", "path": "." },
+    { "name": "Day1·01 Inventory Management", "path": "day1/01_inventory-management" },
+    { "name": "Day1·02 Developer Platform", "path": "day1/02_developer-platform" },
+    { "name": "Day1·03 Prompt Rescue", "path": "day1/03_prompt-rescue" },
+    { "name": "Day1·04 Diagnosing AI Problems", "path": "day1/04_diagnosing-ai-problems" },
+    { "name": "Day2·01 Evals", "path": "day2/01_evals" },
+    { "name": "Day2·02 Inference Optimization", "path": "day2/02_inference-optimization" },
+    { "name": "Day2·03 Context Engineering", "path": "day2/03_context-engineering" },
+    { "name": "Day2·04 Agent Build Hackathon", "path": "day2/04_agent-build-hackathon" }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder:ROOT (workshop)}/.venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "jupyter.notebookFileRoot": "${fileDirname}",
+    "files.exclude": {
+      "**/__pycache__": true,
+      "**/.ipynb_checkpoints": true,
+      "**/.pytest_cache": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-toolsai.jupyter",
+      "vue.volar",
+      "anthropic.claude-code"
+    ]
+  }
+}
