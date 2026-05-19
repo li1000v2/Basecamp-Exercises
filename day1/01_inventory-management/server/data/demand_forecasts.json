@@ -79,5 +79,68 @@
     "forecasted_demand": 96,
     "trend": "stable",
     "period": "Next 30 days"
+  },
+  {
+    "id": "10",
+    "item_sku": "LED-406",
+    "item_name": "LED Driver IC",
+    "current_demand": 900,
+    "forecasted_demand": 1300,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "11",
+    "item_sku": "PCB-003",
+    "item_name": "Multi Layer PCB Assembly",
+    "current_demand": 520,
+    "forecasted_demand": 750,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "12",
+    "item_sku": "ACC-206",
+    "item_name": "3-Axis Accelerometer",
+    "current_demand": 350,
+    "forecasted_demand": 500,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "13",
+    "item_sku": "PCB-001",
+    "item_name": "Single Layer PCB Assembly",
+    "current_demand": 520,
+    "forecasted_demand": 700,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "14",
+    "item_sku": "MCU-401",
+    "item_name": "8-bit Microcontroller",
+    "current_demand": 1580,
+    "forecasted_demand": 1600,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "15",
+    "item_sku": "STP-303",
+    "item_name": "Stepper Motor NEMA 17",
+    "current_demand": 98,
+    "forecasted_demand": 100,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "16",
+    "item_sku": "SRV-301",
+    "item_name": "Micro Servo Motor",
+    "current_demand": 85,
+    "forecasted_demand": 60,
+    "trend": "decreasing",
+    "period": "Next 30 days"
   }
 ]

@@ -1,3 +1,5 @@
+from collections import Counter
+from datetime import datetime, timedelta
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
@@ -13,6 +15,10 @@ QUARTER_MAP = {
     'Q3-2025': ['2025-07', '2025-08', '2025-09'],
     'Q4-2025': ['2025-10', '2025-11', '2025-12']
 }
+
+# Restocking submission constants
+LEAD_TIME_DAYS = {"Express": 7, "Standard": 14, "Economy": 30}
+_restocking_counter = 0
 
 def filter_by_month(items: list, month: Optional[str]) -> list:
     """Filter items by month/quarter based on order_date field"""
@@ -80,6 +86,7 @@ class Order(BaseModel):
     actual_delivery: Optional[str] = None
     warehouse: Optional[str] = None
     category: Optional[str] = None
+    delivery_lead_time: Optional[int] = None
 
 class DemandForecast(BaseModel):
     id: str
@@ -119,6 +126,16 @@ class CreatePurchaseOrderRequest(BaseModel):
     unit_cost: float
     expected_delivery_date: str
     notes: Optional[str] = None
+
+class SubmittedOrderItem(BaseModel):
+    sku: str
+    name: str
+    quantity: int
+    unit_price: float
+
+class CreateRestockingOrderRequest(BaseModel):
+    items: List[SubmittedOrderItem]
+    delivery_tier: str
 
 # API endpoints
 @app.get("/")
@@ -160,6 +177,44 @@ def get_order(order_id: str):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
+
+@app.post("/api/restocking-orders", response_model=Order)
+def create_restocking_order(payload: CreateRestockingOrderRequest):
+    """Submit a user-built restocking order; appended to in-memory orders list."""
+    global _restocking_counter
+
+    if payload.delivery_tier not in LEAD_TIME_DAYS:
+        raise HTTPException(status_code=400, detail=f"Invalid tier: {payload.delivery_tier}")
+    if not payload.items:
+        raise HTTPException(status_code=400, detail="items must not be empty")
+
+    _restocking_counter += 1
+    lead_days = LEAD_TIME_DAYS[payload.delivery_tier]
+    now = datetime.now()
+
+    sku_to_inv = {i["sku"]: i for i in inventory_items}
+    warehouses = [sku_to_inv[it.sku]["warehouse"] for it in payload.items if it.sku in sku_to_inv]
+    categories = [sku_to_inv[it.sku]["category"] for it in payload.items if it.sku in sku_to_inv]
+
+    def majority(lst, fallback):
+        return Counter(lst).most_common(1)[0][0] if lst else fallback
+
+    new_order = {
+        "id": f"R{_restocking_counter}",
+        "order_number": f"ORD-2025-R{_restocking_counter:03d}",
+        "customer": "Internal Restocking",
+        "items": [it.model_dump() for it in payload.items],
+        "status": "Restocking Submitted",
+        "order_date": now.isoformat(timespec="seconds"),
+        "expected_delivery": (now + timedelta(days=lead_days)).isoformat(timespec="seconds"),
+        "total_value": round(sum(it.quantity * it.unit_price for it in payload.items), 2),
+        "actual_delivery": None,
+        "warehouse": majority(warehouses, "Multi-Warehouse"),
+        "category": majority(categories, None),
+        "delivery_lead_time": lead_days,
+    }
+    orders.append(new_order)
+    return new_order
 
 @app.get("/api/demand", response_model=List[DemandForecast])
 def get_demand_forecasts():

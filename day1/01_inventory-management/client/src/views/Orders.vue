@@ -29,7 +29,7 @@
 
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">{{ t('orders.allOrders') }} ({{ orders.length }})</h3>
+          <h3 class="card-title">{{ t('orders.allOrders') }} ({{ regularOrders.length }})</h3>
         </div>
         <div class="table-container">
           <table class="orders-table">
@@ -45,7 +45,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in orders" :key="order.id">
+              <tr v-for="order in regularOrders" :key="order.id">
                 <td class="col-order-number"><strong>{{ order.order_number }}</strong></td>
                 <td class="col-customer">{{ translateCustomerName(order.customer) }}</td>
                 <td class="col-items">
@@ -74,6 +74,41 @@
           </table>
         </div>
       </div>
+
+      <div class="card submitted-restocking-card">
+        <div class="card-header">
+          <h3 class="card-title">Submitted Restocking Orders ({{ submittedRestockingOrders.length }})</h3>
+        </div>
+        <div v-if="submittedRestockingOrders.length === 0" class="empty-state">
+          No restocking orders submitted yet.
+        </div>
+        <div v-else class="table-container">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th class="col-order-number">Order #</th>
+                <th class="col-date">Submitted</th>
+                <th class="col-date">Expected Delivery</th>
+                <th class="col-lead">Lead Time</th>
+                <th class="col-items-count">Items</th>
+                <th class="col-value">Total Value</th>
+                <th class="col-status">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in submittedRestockingOrders" :key="order.id">
+                <td class="col-order-number"><strong>{{ order.order_number }}</strong></td>
+                <td class="col-date">{{ formatDate(order.order_date) }}</td>
+                <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
+                <td class="col-lead">{{ order.delivery_lead_time != null ? order.delivery_lead_time + ' days' : '—' }}</td>
+                <td class="col-items-count">{{ order.items.length }}</td>
+                <td class="col-value"><strong>{{ currencySymbol }}{{ order.total_value.toLocaleString() }}</strong></td>
+                <td class="col-status"><span class="badge info">Submitted</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -95,6 +130,13 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const orders = ref([])
+
+    const regularOrders = computed(() =>
+      orders.value.filter(o => o.status !== 'Restocking Submitted')
+    )
+    const submittedRestockingOrders = computed(() =>
+      orders.value.filter(o => o.status === 'Restocking Submitted')
+    )
 
     // Use shared filters
     const {
@@ -160,6 +202,8 @@ export default {
       loading,
       error,
       orders,
+      regularOrders,
+      submittedRestockingOrders,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,
@@ -275,5 +319,25 @@ export default {
 .item-meta {
   font-size: 0.813rem;
   color: #64748b;
+}
+
+.submitted-restocking-card {
+  margin-top: 1.5rem;
+}
+
+.col-lead {
+  width: 110px;
+}
+
+.col-items-count {
+  width: 80px;
+  text-align: center;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.938rem;
 }
 </style>
